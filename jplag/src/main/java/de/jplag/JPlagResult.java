@@ -3,7 +3,10 @@ package de.jplag;
 import java.util.List;
 
 import de.jplag.clustering.ClusteringResult;
+import de.jplag.clustering.IntegerMapping;
 import de.jplag.options.JPlagOptions;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 
 /**
  * Encapsulates the results of a comparison of a set of source code submissions.
@@ -21,19 +24,47 @@ public class JPlagResult {
     private final int[] similarityDistribution; // 10-element array representing the similarity distribution of the detected matches.
 
     private List<ClusteringResult<Submission>> clusteringResult;
+    private final IntegerMapping<Submission> submissionToIndexMapping;
+
+
+
+
+    private final RealMatrix similarityMatrix;
 
     public JPlagResult(List<JPlagComparison> comparisons, SubmissionSet submissions, long durationInMillis, JPlagOptions options) {
         this.comparisons = comparisons;
         this.submissions = submissions;
         this.durationInMillis = durationInMillis;
         this.options = options;
-        similarityDistribution = calculateSimilarityDistribution(comparisons);
+        this.similarityDistribution = calculateSimilarityDistribution(comparisons);
+        /*this.*/
         comparisons.sort((first, second) -> Float.compare(second.similarity(), first.similarity())); // Sort by percentage (descending).
+        this.submissionToIndexMapping = new IntegerMapping<>(comparisons.size());
+        this.similarityMatrix = calculateSimilarityMatrix(comparisons, options);
+    }
+
+    private RealMatrix calculateSimilarityMatrix(List<JPlagComparison> comparisons, JPlagOptions options) {
+        for (JPlagComparison comparison : comparisons) {
+            submissionToIndexMapping.map(comparison.getFirstSubmission());
+            submissionToIndexMapping.map(comparison.getSecondSubmission());
+        }
+        int size = submissionToIndexMapping.size();
+
+        final RealMatrix similarityMatrix = new Array2DRowRealMatrix(size, size);
+        for (JPlagComparison comparison : comparisons) {
+            int firstIndex = submissionToIndexMapping.map(comparison.getFirstSubmission());
+            int secondIndex = submissionToIndexMapping.map(comparison.getSecondSubmission());
+            float similarity = options.getSimilarityMetric().apply(comparison);
+            similarityMatrix.setEntry(firstIndex, secondIndex, similarity);
+            similarityMatrix.setEntry(secondIndex, firstIndex, similarity);
+        }
+        return similarityMatrix;
     }
 
     /**
      * Drops elements from the comparison list to free memory. Note, that this affects the similarity distribution and is
      * only meant to be used if you don't need the information about comparisons with lower match percentage anymore.
+     *
      * @param limit the number of comparisons to keep in the list
      */
     public void dropComparisons(int limit) {
@@ -53,8 +84,9 @@ public class JPlagResult {
 
     /**
      * Returns the first n comparisons (sorted by percentage, descending), limited by the specified parameter.
+     *
      * @param numberOfComparisons specifies the number of requested comparisons. If set to -1, all comparisons will be
-     * returned.
+     *                            returned.
      * @return a list of comparisons sorted descending by percentage.
      */
     public List<JPlagComparison> getComparisons(int numberOfComparisons) {
@@ -96,12 +128,17 @@ public class JPlagResult {
      * Returns the similarity distribution of detected matches in a 10-element array. Each entry represents the absolute
      * frequency of matches whose similarity lies within the respective interval. Intervals: 0: [0% - 10%), 1: [10% - 20%),
      * 2: [20% - 30%), ..., 9: [90% - 100%]
+     *
      * @return the similarity distribution array.
      */
     public int[] getSimilarityDistribution() {
         return similarityDistribution;
     }
-
+    public float getSimilarityOfSubmissions(Submission submission1, Submission submission2) {
+        int indexOfSubmission1 = submissionToIndexMapping.map(submission1);
+        int indexOfSubmission2 = submissionToIndexMapping.map(submission2);
+        return (float) similarityMatrix.getEntry(indexOfSubmission1, indexOfSubmission2);
+    }
     public List<ClusteringResult<Submission>> getClusteringResult() {
         return this.clusteringResult;
     }

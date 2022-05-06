@@ -20,7 +20,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class ClusteringResult<T> {
 
     private final List<Cluster<T>> clusters;
-    private float communityStrength = 0;
+    private final float communityStrength;
 
     public ClusteringResult(Collection<Cluster<T>> clusters, float communityStrength) {
         this.clusters = List.copyOf(clusters);

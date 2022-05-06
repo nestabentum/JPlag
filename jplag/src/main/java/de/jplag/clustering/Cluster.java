@@ -60,8 +60,7 @@ public class Cluster<T> {
      * @return normalized community strength per connection
      */
     public float getNormalizedCommunityStrengthPerConnection() {
-        List<Cluster<T>> goodClusters = clusteringResult.getClusters().stream().filter(cluster -> cluster.getCommunityStrength() > 0)
-                .collect(Collectors.toList());
+        List<Cluster<T>> goodClusters = clusteringResult.getClusters().stream().filter(cluster -> cluster.getCommunityStrength() > 0).toList();
         float posCommunityStrengthSum = (float) goodClusters.stream().mapToDouble(Cluster::getCommunityStrengthPerConnection).sum();
 
         int size = clusteringResult.getClusters().size();

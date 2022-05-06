@@ -5,11 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import de.jplag.JPlagComparison;
@@ -17,6 +14,7 @@ import de.jplag.JPlagResult;
 import de.jplag.Submission;
 import de.jplag.Token;
 import de.jplag.TokenList;
+import de.jplag.clustering.ClusteringResult;
 import de.jplag.reporting.reportobject.model.Cluster;
 import de.jplag.reporting.reportobject.model.ComparisonReport;
 import de.jplag.reporting.reportobject.model.FilesOfSubmission;
@@ -33,6 +31,7 @@ public class ReportObjectFactory {
 
     /**
      * Converts a JPlagResult to a JPlagReport.
+     *
      * @return JPlagReport for the given JPlagResult.
      */
     public static JPlagReport getReportObject(JPlagResult result) {
@@ -74,6 +73,7 @@ public class ReportObjectFactory {
 
     /**
      * Generates detailed ComparisonReport DTO for each comparison in a JPlagResult.
+     *
      * @return A list with ComparisonReport DTOs.
      */
     private static List<ComparisonReport> generateComparisonReports(JPlagResult result) {
@@ -96,6 +96,7 @@ public class ReportObjectFactory {
 
     /**
      * Gets the names of all submissions.
+     *
      * @return A list containing all submission names.
      */
     private static List<String> extractSubmissionNames(List<JPlagComparison> comparisons) {
@@ -109,6 +110,7 @@ public class ReportObjectFactory {
 
     /**
      * Gets the names of all comparison.
+     *
      * @return A list containing all comparisons.
      */
     private static List<String> getComparisonNames(List<JPlagComparison> comparisons) {
@@ -122,6 +124,7 @@ public class ReportObjectFactory {
 
     /**
      * Gets the used metric in a JPlag comparison.
+     *
      * @return A list contains Metric DTOs.
      */
     private static List<Metric> getMetrics(JPlagResult result) {
@@ -134,6 +137,7 @@ public class ReportObjectFactory {
     /**
      * Converts JPlagComparison to a DTO for displaying only comparisons. See
      * {@link #generateComparisonReports(JPlagResult)} for a more detailed representation of a comparison.
+     *
      * @return List containing TopComparison DTOs.
      */
     private static List<TopComparison> getTopComparisons(List<JPlagComparison> comparisons) {
@@ -145,6 +149,7 @@ public class ReportObjectFactory {
 
     /**
      * Converts files of a submission to FilesOFSubmission DTO.
+     *
      * @return A list containing FilesOfSubmission DTOs.
      */
     private static List<FilesOfSubmission> getFilesForSubmission(Submission submission) {
@@ -153,9 +158,10 @@ public class ReportObjectFactory {
 
     /**
      * Converts a JPlag Match object to a Match DTO.
+     *
      * @param comparison The comparison from which the match originates.
-     * @param match The match to be converted.
-     * @param usesIndex Indicates whether the language uses indexes.
+     * @param match      The match to be converted.
+     * @param usesIndex  Indicates whether the language uses indexes.
      * @return A Match DTO.
      */
     private static Match convertMatchToReportMatch(JPlagComparison comparison, de.jplag.Match match, Boolean usesIndex) {
@@ -177,9 +183,20 @@ public class ReportObjectFactory {
 
     // TODO implement after PR Read clustering #281
     private static List<Cluster> getClusters(JPlagResult result) {
-        // List<ClusteringResult<Submission>> clusters = result.getClusteringResult();
-        // return clusters.map( c -> new Cluster(getAvgSimilarity, getStrength, c.getMembers().map(Submission::getName)))
-        return List.of();
+        List<ClusteringResult<Submission>> clusteringResult = result.getClusteringResult();
+
+        return clusteringResult.stream()
+                .map(ClusteringResult::getClusters)
+                .flatMap(Collection::stream)
+                .map(cluster -> convertCluster(cluster,result::getSimilarityOfSubmissions))
+                .toList();
+    }
+
+    private static Cluster convertCluster(de.jplag.clustering.Cluster<Submission> from, BiFunction<Submission,Submission,Float> func) {
+        var strength = from.getCommunityStrength();
+        var avgSimilarity = from.averageSimilarity(func);
+        var member = from.getMembers().stream().map(Submission::getName).toList();
+        return new Cluster(avgSimilarity, strength, member);
     }
 
     private static List<String> readFileLines(File file) {
