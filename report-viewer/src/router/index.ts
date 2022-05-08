@@ -21,10 +21,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "/comparison",
         name: "ComparisonView",
         component: ComparisonView,
-        props: route => ({
-            firstId: route.query.firstId,
-            secondId: route.query.secondId
-        })
+        props: true
     },
 ];
 

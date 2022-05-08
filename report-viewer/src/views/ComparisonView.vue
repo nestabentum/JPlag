@@ -3,102 +3,139 @@
 -->
 <template>
   <div class="container">
-    <button id="show-button" :class="{hidden : !hideLeftPanel}" title="Show sidebar" @click="togglePanel">
-      <img alt="show" src="@/assets/double_arrow_black_24dp.svg">
+    <button
+      id="show-button"
+      :class="{ hidden: !hideLeftPanel }"
+      title="Show sidebar"
+      @click="togglePanel"
+    >
+      <img alt="show" src="@/assets/double_arrow_black_24dp.svg" />
     </button>
-    <div id="sidebar" :class="{ hidden : hideLeftPanel }">
+    <div id="sidebar" :class="{ hidden: hideLeftPanel }">
       <div class="title-section">
         <h1>JPlag Comparison</h1>
         <button id="hide-button" title="Hide sidebar" @click="togglePanel">
-          <img alt="hide" src="@/assets/keyboard_double_arrow_left_black_24dp.svg"></button>
+          <img
+            alt="hide"
+            src="@/assets/keyboard_double_arrow_left_black_24dp.svg"
+          />
+        </button>
       </div>
-      <TextInformation :anonymous="store.state.anonymous.has(firstId)" :value="firstId" label="Submission 1"/>
-      <TextInformation :anonymous="store.state.anonymous.has(secondId)" :value="secondId" label="Submission 2"/>
-      <TextInformation :value="comparison.match_percentage" label="Match %"/>
-      <MatchTable :id1="firstId" :id2="secondId" :matches="comparison.allMatches" @match-selected="showMatch"/>
+      <TextInformation
+        :anonymous="store.state.anonymous.has(firstId)"
+        :value="firstId"
+        label="Submission 1"
+      />
+      <TextInformation
+        :anonymous="store.state.anonymous.has(secondId)"
+        :value="secondId"
+        label="Submission 2"
+      />
+      <TextInformation :value="comparison.match_percentage" label="Match %" />
+      <MatchTable
+        :id1="firstId"
+        :id2="secondId"
+        :matches="comparison.allMatches"
+        @match-selected="showMatch"
+      />
     </div>
-    <FilesContainer :container-id="1" :files="filesOfFirst" :matches="comparison.matchesInFirstSubmission"
-                    files-owner="Submission 1"
-                    @toggle-collapse="toggleCollapseFirst"
-                    @line-selected="showMatchInSecond"/>
-    <FilesContainer :container-id="2" :files="filesOfSecond" :matches="comparison.matchesInSecondSubmissions"
-                    files-owner="Submission 2"
-                    @toggle-collapse="toggleCollapseSecond"
-                    @line-selected="showMatchInFirst"/>
+    <FilesContainer
+      :container-id="1"
+      :files="filesOfFirst"
+      :matches="comparison.matchesInFirstSubmission"
+      files-owner="Submission 1"
+      @toggle-collapse="toggleCollapseFirst"
+      @line-selected="showMatchInSecond"
+    />
+    <FilesContainer
+      :container-id="2"
+      :files="filesOfSecond"
+      :matches="comparison.matchesInSecondSubmissions"
+      files-owner="Submission 2"
+      @toggle-collapse="toggleCollapseSecond"
+      @line-selected="showMatchInFirst"
+    />
   </div>
 </template>
 
 <script>
-import {defineComponent, ref} from "vue";
-import {generateLineCodeLink} from "@/utils/Utils";
+import { defineComponent, ref } from "vue";
+import { generateLineCodeLink } from "@/utils/Utils";
 import store from "@/store/store";
 import router from "@/router";
 import TextInformation from "@/components/TextInformation";
 import MatchTable from "@/components/MatchTable";
-import {ComparisonFactory} from "@/model/factories/ComparisonFactory";
+import { ComparisonFactory } from "@/model/factories/ComparisonFactory";
 import FilesContainer from "@/components/FilesContainer";
 
 export default defineComponent({
   name: "ComparisonView",
-  components: {FilesContainer, MatchTable, TextInformation},
+  components: { FilesContainer, MatchTable, TextInformation },
   props: {
-    firstId: {
-      type: String,
-    },
-    secondId: {
-      type: String,
-    },
+    firstId: { type: String, required: true },
+    secondId: {type: String, required: true},
   },
   setup(props) {
     /**
      * Name of the comparison file. Comparison files should be named {ID1}-{ID2}
      * @type {string}
      */
-    const fileName1 = props.firstId.concat("-").concat(props.secondId)
-    const fileName2 = props.firstId.concat("-").concat(props.secondId)
+    const fileName1 = props.firstId.concat("-").concat(props.secondId);
+    const fileName2 = props.firstId.concat("-").concat(props.secondId);
 
     let comparison;
     //getting the comparison file based on the used mode (zip, local, single)
     if (store.state.local) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        comparison = ComparisonFactory.getComparison(require(`../files/${fileName1}.json`))
+        comparison = ComparisonFactory.getComparison(
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          require(`../files/${fileName1}.json`)
+        );
       } catch (exception) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
-          comparison = ComparisonFactory.getComparison(require(`../files/${fileName2}.json`))
+          comparison = ComparisonFactory.getComparison(
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
+            require(`../files/${fileName2}.json`)
+          );
         } catch (exception) {
-          router.back()
+          router.back();
         }
       }
     } else if (store.state.zip) {
       if (store.state.files[fileName1.concat(".json")]) {
-        comparison = ComparisonFactory.getComparison(JSON.parse(store.state.files[fileName1.concat(".json")]))
+        comparison = ComparisonFactory.getComparison(
+          JSON.parse(store.state.files[fileName1.concat(".json")])
+        );
       } else {
-        comparison = ComparisonFactory.getComparison(JSON.parse(store.state.files[fileName2.concat(".json")]))
+        comparison = ComparisonFactory.getComparison(
+          JSON.parse(store.state.files[fileName2.concat(".json")])
+        );
       }
-
     } else if (store.state.single) {
-      comparison = ComparisonFactory.getComparison(JSON.parse(store.state.fileString))
+      comparison = ComparisonFactory.getComparison(
+        JSON.parse(store.state.fileString)
+      );
     }
 
-    const filesOfFirst = ref(comparison.filesOfFirstSubmission)
-    const filesOfSecond = ref(comparison.filesOfSecondSubmission)
+    const filesOfFirst = ref(comparison.filesOfFirstSubmission);
+    const filesOfSecond = ref(comparison.filesOfSecondSubmission);
 
     /**
      * Collapses a file in the first files container.
      * @param title
      */
     const toggleCollapseFirst = (title) => {
-      filesOfFirst.value[title].collapsed = !filesOfFirst.value[title].collapsed
-    }
+      filesOfFirst.value[title].collapsed =
+        !filesOfFirst.value[title].collapsed;
+    };
     /**
      * Collapses a file in the second files container.
      * @param title
      */
     const toggleCollapseSecond = (title) => {
-      filesOfSecond.value[title].collapsed = !filesOfSecond.value[title].collapsed
-    }
+      filesOfSecond.value[title].collapsed =
+        !filesOfSecond.value[title].collapsed;
+    };
     /**
      * Shows a match in the first files container
      * @param e
@@ -108,10 +145,12 @@ export default defineComponent({
      */
     const showMatchInFirst = (e, panel, file, line) => {
       if (!filesOfFirst.value[file].collapsed) {
-        toggleCollapseFirst(file)
+        toggleCollapseFirst(file);
       }
-      document.getElementById(generateLineCodeLink(panel, file, line)).scrollIntoView()
-    }
+      document
+        .getElementById(generateLineCodeLink(panel, file, line))
+        .scrollIntoView();
+    };
     /**
      * Shows a match in the second files container.
      * @param e
@@ -121,22 +160,23 @@ export default defineComponent({
      */
     const showMatchInSecond = (e, panel, file, line) => {
       if (!filesOfSecond.value[file].collapsed) {
-        toggleCollapseSecond(file)
+        toggleCollapseSecond(file);
       }
-      document.getElementById(generateLineCodeLink(panel, file, line)).scrollIntoView()
-    }
+      document
+        .getElementById(generateLineCodeLink(panel, file, line))
+        .scrollIntoView();
+    };
 
     const showMatch = (e, match) => {
-      showMatchInFirst(e, 1, match.firstFile, match.startInFirst)
-      showMatchInSecond(e, 2, match.secondFile, match.startInSecond)
-    }
-
+      showMatchInFirst(e, 1, match.firstFile, match.startInFirst);
+      showMatchInSecond(e, 2, match.secondFile, match.startInSecond);
+    };
 
     //Left panel
-    const hideLeftPanel = ref(true)
+    const hideLeftPanel = ref(true);
     const togglePanel = () => {
-      hideLeftPanel.value = !hideLeftPanel.value
-    }
+      hideLeftPanel.value = !hideLeftPanel.value;
+    };
 
     return {
       comparison,
@@ -151,10 +191,10 @@ export default defineComponent({
       showMatch,
       togglePanel,
 
-      store
-    }
-  }
-})
+      store,
+    };
+  },
+});
 </script>
 
 <style scoped>
