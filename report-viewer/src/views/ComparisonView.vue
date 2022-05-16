@@ -2,11 +2,7 @@
   A view displaying the .json file of a comparison from a JPlag report.
 -->
 <template>
-  <div class="menubar">
-    <button @click="navigateBack" style="icon">
-      <font-awesome-icon :icon="['fas', 'house']" />
-    </button>
-  </div>
+  <MenuBar />
   <div class="container">
     <button
       id="show-button"
@@ -72,10 +68,11 @@ import TextInformation from "@/components/TextInformation";
 import MatchTable from "@/components/MatchTable";
 import { ComparisonFactory } from "@/model/factories/ComparisonFactory";
 import FilesContainer from "@/components/FilesContainer";
+import MenuBar from "@/components/MenuBar";
 
 export default defineComponent({
   name: "ComparisonView",
-  components: { FilesContainer, MatchTable, TextInformation },
+  components: { FilesContainer, MatchTable, TextInformation, MenuBar },
   setup() {
     /**
      * Name of the comparison file. Comparison files should be named {ID1}-{ID2}
@@ -179,12 +176,6 @@ export default defineComponent({
       showMatchInSecond(e, 2, match.secondFile, match.startInSecond);
     };
 
-    const navigateBack = () => {
-      router.push({
-        name: "FileUploadView",
-      });
-    };
-
     //Left panel
     const hideLeftPanel = ref(true);
     const togglePanel = () => {
@@ -205,7 +196,6 @@ export default defineComponent({
       showMatchInSecond,
       showMatch,
       togglePanel,
-      navigateBack,
 
       store,
     };
@@ -226,17 +216,6 @@ h1 {
   width: 100%;
   height: 100%;
   background: var(--background-color);
-}
-.menubar {
-  display: flex;
-  flex-direction: row-reverse;
-  padding: 5px;
-  margin-bottom: 10px;
-  position: -webkit-sticky; /* Safari */
-  position: sticky;
-  top: 0;
-  right: 0;
-  background-color: transparent;
 }
 
 .title-section {

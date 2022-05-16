@@ -2,7 +2,8 @@
   A view displaying the overview file of a JPlag report.
 -->
 <template>
-  <div class="container">
+  <MenuBar />
+  <div class="container" v-bind="$attrs">
     <div class="column-container" style="width: 30%">
       <h1>JPlag Report</h1>
       <p class="section-title">Main Info:</p>
@@ -98,6 +99,7 @@ import MetricButton from "@/components/MetricButton";
 import ComparisonsTable from "@/components/ComparisonsTable";
 import { OverviewFactory } from "@/model/factories/OverviewFactory";
 import IDsList from "@/components/IDsList";
+import MenuBar from "@/components/MenuBar";
 
 export default defineComponent({
   name: "OverviewView",
@@ -107,6 +109,7 @@ export default defineComponent({
     DistributionDiagram,
     MetricButton,
     TextInformation,
+    MenuBar,
   },
   setup() {
     let overview;
