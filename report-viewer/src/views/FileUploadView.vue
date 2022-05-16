@@ -48,8 +48,8 @@ export default defineComponent({
       router.push({
         name: "ComparisonView",
         params: {
-          firstId,
-          secondId,
+          id1: firstId,
+          id2: secondId,
         },
       });
     };

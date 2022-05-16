@@ -67,7 +67,7 @@
 import { defineComponent, ref } from "vue";
 import { generateLineCodeLink } from "@/utils/Utils";
 import store from "@/store/store";
-import router from "@/router";
+import { useRouter, useRoute } from "vue-router";
 import TextInformation from "@/components/TextInformation";
 import MatchTable from "@/components/MatchTable";
 import { ComparisonFactory } from "@/model/factories/ComparisonFactory";
@@ -76,17 +76,19 @@ import FilesContainer from "@/components/FilesContainer";
 export default defineComponent({
   name: "ComparisonView",
   components: { FilesContainer, MatchTable, TextInformation },
-  props: {
-    firstId: { type: String, required: true },
-    secondId: { type: String, required: true },
-  },
-  setup(props) {
+  setup() {
     /**
      * Name of the comparison file. Comparison files should be named {ID1}-{ID2}
      * @type {string}
      */
-    const fileName1 = props.firstId.concat("-").concat(props.secondId);
-    const fileName2 = props.firstId.concat("-").concat(props.secondId);
+    const router = useRouter();
+    const route = useRoute();
+
+    const firstId = route.params.id1;
+    const secondId = route.params.id2;
+
+    const fileName1 = firstId.concat("-").concat(secondId);
+    const fileName2 = secondId.concat("-").concat(firstId);
 
     let comparison;
     //getting the comparison file based on the used mode (zip, local, single)
@@ -194,6 +196,8 @@ export default defineComponent({
       filesOfFirst,
       filesOfSecond,
       hideLeftPanel,
+      firstId,
+      secondId,
 
       toggleCollapseFirst,
       toggleCollapseSecond,
