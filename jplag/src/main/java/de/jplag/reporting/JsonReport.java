@@ -24,10 +24,10 @@ public class JsonReport implements Report {
     @Override
     public boolean saveReport(JPlagResult result, String path) {
         JPlagReport report = ReportObjectFactory.getReportObject(result);
-        File dir = new File(path);
-        if (!dir.exists()) {
-            if (!dir.mkdir()) {
-                System.out.println("Failed to create dir.");
+        File directory = new File(path);
+        if (!directory.exists()) {
+            if (!directory.mkdirs()) {
+                logger.error("Failed to create dir.");
             }
         }
         return JsonFactory.saveJsonFiles(report, path);

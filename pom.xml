@@ -22,15 +22,6 @@
 
     <developers>
         <developer>
-            <id>sebinside</id>
-            <name>Sebastian Hahner</name>
-            <email>hahner@kit.edu</email>
-            <url>https://sdq.ipd.kit.edu/people/sebastian-hahner/</url>
-            <organization>KASTEL</organization>
-            <organizationUrl>https://dsis.kastel.kit.edu/</organizationUrl>
-            <timezone>GMT+1</timezone>
-        </developer>
-        <developer>
             <id>tsaglam</id>
             <name>Timur Sağlam</name>
             <email>saglam@kit.edu</email>
@@ -39,18 +30,29 @@
             <organizationUrl>https://dsis.kastel.kit.edu/</organizationUrl>
             <timezone>GMT+1</timezone>
         </developer>
+        <developer>
+            <id>sebinside</id>
+            <name>Sebastian Hahner</name>
+            <email>hahner@kit.edu</email>
+            <url>https://sdq.ipd.kit.edu/people/sebastian-hahner/</url>
+            <organization>KASTEL</organization>
+            <organizationUrl>https://dsis.kastel.kit.edu/</organizationUrl>
+            <timezone>GMT+1</timezone>
+        </developer>
     </developers>
 
     <modules>
         <module>jplag.frontend-utils</module>
+        <module>jplag.frontend-testutils</module>
         <module>jplag.frontend.chars</module>
         <module>jplag.frontend.cpp</module>
-        <module>jplag.frontend.csharp-1.2</module>
+        <module>jplag.frontend.csharp-6</module>
         <module>jplag.frontend.java</module>
         <module>jplag.frontend.python-3</module>
         <module>jplag.frontend.scheme</module>
         <module>jplag.frontend.text</module>
         <module>jplag</module>
+        <module>jplag.cli</module>
     </modules>
     <scm>
         <connection>scm:git:git://github.com/jplag/JPlag.git</connection>
@@ -81,10 +83,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <spotless.version>2.22.1</spotless.version>
+        <spotless.version>2.22.8</spotless.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <!-- The Revision of JPlag -->
         <revision>4.0.0-SNAPSHOT</revision>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <!-- ANTLR -->
@@ -113,23 +117,22 @@
                 <artifactId>antlr3-runtime</artifactId>
                 <version>3.5</version>
             </dependency>
-
             <dependency>
                 <groupId>net.sourceforge.argparse4j</groupId>
                 <artifactId>argparse4j</artifactId>
                 <version>0.9.0</version>
             </dependency>
+
+            <!-- LOGGER -->
             <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-rules</artifactId>
-                <version>1.19.0</version>
-                <scope>test</scope>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.13.2</version>
-                <scope>test</scope>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
 
             <!-- JPLAG -->
@@ -150,7 +153,7 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>csharp-1.2</artifactId>
+                <artifactId>csharp-6</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -175,15 +178,43 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>frontend-testutils</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>jplag</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-lambda</artifactId>
+            <version>1.2.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>4.6.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -250,6 +281,13 @@
                             </manifest>
                         </archive>
                     </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-assembly-plugin</artifactId>
@@ -296,6 +334,11 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M7</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -352,6 +395,7 @@
                         <phase>verify</phase>
                         <configuration>
                             <keyname>0xC6E9DAC2</keyname>
+                            <!--suppress UnresolvedMavenProperty -->
                             <passphrase>${env.GPG_PASSPHRASE}</passphrase>
                         </configuration>
                     </execution>
@@ -360,7 +404,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.12</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -375,6 +419,7 @@
                 <configuration>
                     <java>
                         <eclipse>
+                            <!--suppress UnresolvedMavenProperty -->
                             <file>${maven.multiModuleProjectDirectory}/formatter.xml</file>
                         </eclipse>
 

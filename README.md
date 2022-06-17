@@ -1,5 +1,5 @@
 <p align="center"> 
-	<img alt="JPlag logo" src="jplag/src/main/resources/de/jplag/reporting/data/logo-dark.png" width="350">
+	<img alt="JPlag logo" src="jplag/src/main/resources/de/jplag/logo-dark.png" width="350">
 </p>
 
 # JPlag - Detecting Software Plagiarism
@@ -8,6 +8,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.jplag/jplag/badge.svg)](https://maven-badges.herokuapp.com/maven-central/de.jplag/jplag)
 [![License](https://img.shields.io/github/license/jplag/jplag.svg)](https://github.com/jplag/jplag/blob/master/LICENSE)
 [![Lines of code](https://img.shields.io/tokei/lines/github/jplag/jplag)](https://github.com/jplag/jplag/graphs/contributors)
+
+JPlag is a system that finds similarities among multiple sets of source code files. This way it can detect software plagiarism and collusion in software development. JPlag currently supports Java, C#, C, C++, Python 3, Scheme, and natural language text.
 
 ## Download and Installation
 
@@ -28,7 +30,7 @@ JPlag is released on [Maven Central](https://search.maven.org/search?q=de.jplag)
 1. Download or clone the code from this repository.
 2. Run `mvn clean package` from the root of the repository to compile and build all submodules.
    Run `mvn clean package assembly:single` instead if you need the full jar which includes all dependencies.
-5. You will find the generated JARs in the subdirectory `jplag/target`.
+5. You will find the generated JARs in the subdirectory `jplag.cli/target`.
 
 ## Usage
 JPlag can either be used via the CLI or directly via its Java API. For more information, see the [usage information in the wiki](https://github.com/jplag/JPlag/wiki/1.-How-to-Use-JPlag).
