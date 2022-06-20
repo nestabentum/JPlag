@@ -21,23 +21,31 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
+<script lang="ts">
+import { defineComponent, ref, PropType } from "vue";
 import { GDialog } from "gitart-vue-dialog";
-import ClusterRadarChart from "@/components/ClusterRadarChart";
-
+import ClusterRadarChart from "@/components/ClusterRadarChart.vue";
+import { ClusterListElement } from "@/model/ClusterListElement";
+import { ComparisonListElement } from "@/model/ComparisonListElement";
 export default defineComponent({
   name: "ClustersList",
   components: { ClusterRadarChart, GDialog },
   props: {
-    comparison: {},
-    clusters: Array,
+    comparison: {
+      type: Object as PropType<ComparisonListElement>,
+      required: true,
+
+    },
+    clusters: {
+      type: Array<ClusterListElement>,
+      required: true
+  },
   },
 
   setup() {
     const dialog = ref(false);
     const toggleDialog = () => (dialog.value = !dialog.value);
-    const getMemberNames = (cluster) => {
+    const getMemberNames = (cluster: ClusterListElement) => {
       const members = Object.keys(cluster.members);
       let concatenatedMembers = "";
       let i;
