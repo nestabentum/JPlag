@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import de.jplag.*;
 import de.jplag.reporting.reportobject.mapper.ClusteringResultMapper;
+import de.jplag.options.SimilarityMetric;
 import de.jplag.reporting.reportobject.model.*;
 import de.jplag.reporting.reportobject.model.Match;
 
@@ -113,17 +115,39 @@ public class ReportObjectFactory {
         return names;
     }
 
-    // Currently, only one metric can be obtained.
-
     /**
-     * Gets the used metric in a JPlag comparison.
+     * Gets the used metrics in a JPlag comparison. As Max Metric is included in every JPlag run, this always include Max
+     * Metric.
      * @return A list contains Metric DTOs.
      */
     private static List<Metric> getMetrics(JPlagResult result) {
         List<Metric> metrics = new ArrayList<>();
-        metrics.add(new Metric(result.getOptions().getSimilarityMetric().name(), result.getOptions().getSimilarityThreshold(),
-                intArrayToList(result.getSimilarityDistribution()), getTopComparisons(result.getComparisons())));
+
+        Metric metric = new Metric(result.getOptions().getSimilarityMetric().name(), result.getOptions().getSimilarityThreshold(),
+                intArrayToList(result.getSimilarityDistribution()), getTopComparisons(result.getComparisons()),
+                result.getOptions().getSimilarityMetric().getDescription()); // get the metric JPlag was run with
+        metrics.add(metric);
+
+        if (result.getOptions().getSimilarityMetric() != SimilarityMetric.MAX) { // If JPlag was run with the max metric we do not need to calculate
+                                                                                 // nor add it separately as this has already happened in the run
+            var maxMetric = new Metric(SimilarityMetric.MAX.name(), result.getOptions().getSimilarityThreshold(),
+                    intArrayToList(result.getMaxMetricDistribution()), getMaxSimilarityTopComparisons(result.getComparisons()),
+                    SimilarityMetric.MAX.getDescription());
+            metrics.add(maxMetric);
+        }
+
         return metrics;
+    }
+
+    private static List<TopComparison> getMaxSimilarityTopComparisons(List<JPlagComparison> comparisons) {
+        return getTopComparisons(comparisons, JPlagComparison::maximalSimilarity);
+    }
+
+    private static List<TopComparison> getTopComparisons(List<JPlagComparison> comparisons, Function<JPlagComparison, Float> similarityExtractor) {
+        List<TopComparison> topComparisons = new ArrayList<>();
+        comparisons.forEach(comparison -> topComparisons.add(new TopComparison(comparison.getFirstSubmission().getName(),
+                comparison.getSecondSubmission().getName(), similarityExtractor.apply(comparison))));
+        return topComparisons;
     }
 
     /**
@@ -132,10 +156,7 @@ public class ReportObjectFactory {
      * @return List containing TopComparison DTOs.
      */
     private static List<TopComparison> getTopComparisons(List<JPlagComparison> comparisons) {
-        List<TopComparison> topComparisons = new ArrayList<>();
-        comparisons.forEach(comparison -> topComparisons.add(
-                new TopComparison(comparison.getFirstSubmission().getName(), comparison.getSecondSubmission().getName(), comparison.similarity())));
-        return topComparisons;
+        return getTopComparisons(comparisons, JPlagComparison::similarity);
     }
 
     /**
