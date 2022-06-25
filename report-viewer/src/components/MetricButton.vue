@@ -3,41 +3,41 @@
   metric the distribution and comparisons are displayed.
 -->
 <template>
-  <div class="wrapper" v-bind:class="{ selected : isSelected }">
+  <div class="wrapper" v-bind:class="{ selected: isSelected }">
     <div class="metric">
-      <p class="metric-name">{{ metricName }}</p>
-      <img alt="?" src="@/assets/help_outline_black_18dp.svg"/>
+      <p class="metric-name">{{ metric.metricName }}</p>
+      <div class="tooltip">
+        <img alt="?" src="@/assets/help_outline_black_18dp.svg" />
+        <span class="tooltiptext">{{metric.description}}</span>
+      </div>
     </div>
     <div class="threshold">
-      <p>Threshold: </p>
-      <p>{{ metricThreshold }}%</p>
+      <p>Threshold:</p>
+      <p>{{ metric.metricThreshold }}%</p>
     </div>
   </div>
 </template>
 
-<script>
-import {defineComponent} from "vue";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import { Metric } from "@/model/Metric";
 
 export default defineComponent({
   name: "MetricButton",
   props: {
-    metricName: {
-      type: String,
-      required: true
-    },
-    metricThreshold: {
-      type: Number,
-      required: true
+    metric: {
+      type: Object as PropType<Metric>,
+      required: true,
     },
     isSelected: {
       type: Boolean,
-      default: false
+      default: false,
     },
   },
   setup() {
-    return {}
-  }
-})
+    return {};
+  },
+});
 </script>
 
 <style scoped>
@@ -50,7 +50,6 @@ export default defineComponent({
   padding: 5%;
   margin-right: 5%;
 }
-
 
 .wrapper > div > * {
   margin: 0;
@@ -89,5 +88,25 @@ export default defineComponent({
 
 .selected p {
   color: white;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 240px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 10px ;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 </style>
