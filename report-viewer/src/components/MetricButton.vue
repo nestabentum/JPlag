@@ -4,16 +4,12 @@
 -->
 <template>
   <div class="wrapper" v-bind:class="{ selected: isSelected }">
-    <div class="metric">
+    <div>
       <p class="metric-name">{{ metric.metricName }}</p>
       <div class="tooltip">
         <img alt="?" src="@/assets/help_outline_black_18dp.svg" />
         <span class="tooltiptext">{{metric.description}}</span>
       </div>
-    </div>
-    <div class="threshold">
-      <p>Threshold:</p>
-      <p>{{ metric.metricThreshold }}%</p>
     </div>
   </div>
 </template>
@@ -66,9 +62,7 @@ export default defineComponent({
   color: white;
 }
 
-.metric {
-  margin-bottom: 2%;
-}
+
 
 .metric-name {
   font-size: xx-large;

@@ -6,15 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import de.jplag.reporting.reportobject.mapper.MetricMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.jplag.*;
 import de.jplag.reporting.reportobject.mapper.ClusteringResultMapper;
-import de.jplag.options.SimilarityMetric;
 import de.jplag.reporting.reportobject.model.*;
 import de.jplag.reporting.reportobject.model.Match;
 
@@ -25,6 +24,7 @@ public class ReportObjectFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ReportObjectFactory.class);
     private static final ClusteringResultMapper clusteringResultMapper = new ClusteringResultMapper();
+    private static final MetricMapper metricMapper = new MetricMapper();
 
     /**
      * Converts a JPlagResult to a JPlagReport.
@@ -123,41 +123,15 @@ public class ReportObjectFactory {
     private static List<Metric> getMetrics(JPlagResult result) {
         List<Metric> metrics = new ArrayList<>();
 
-        Metric metric = new Metric(result.getOptions().getSimilarityMetric().name(), result.getOptions().getSimilarityThreshold(),
-                intArrayToList(result.getSimilarityDistribution()), getTopComparisons(result.getComparisons()),
-                result.getOptions().getSimilarityMetric().getDescription()); // get the metric JPlag was run with
-        metrics.add(metric);
+        Metric averageMetric = metricMapper.getAverageMetric(result);
+        metrics.add(averageMetric);
 
-        if (result.getOptions().getSimilarityMetric() != SimilarityMetric.MAX) { // If JPlag was run with the max metric we do not need to calculate
-                                                                                 // nor add it separately as this has already happened in the run
-            var maxMetric = new Metric(SimilarityMetric.MAX.name(), result.getOptions().getSimilarityThreshold(),
-                    intArrayToList(result.getMaxMetricDistribution()), getMaxSimilarityTopComparisons(result.getComparisons()),
-                    SimilarityMetric.MAX.getDescription());
-            metrics.add(maxMetric);
-        }
+        Metric maxMetric = metricMapper.getMaxMetric(result);
+        metrics.add(maxMetric);
 
         return metrics;
     }
 
-    private static List<TopComparison> getMaxSimilarityTopComparisons(List<JPlagComparison> comparisons) {
-        return getTopComparisons(comparisons, JPlagComparison::maximalSimilarity);
-    }
-
-    private static List<TopComparison> getTopComparisons(List<JPlagComparison> comparisons, Function<JPlagComparison, Float> similarityExtractor) {
-        List<TopComparison> topComparisons = new ArrayList<>();
-        comparisons.forEach(comparison -> topComparisons.add(new TopComparison(comparison.getFirstSubmission().getName(),
-                comparison.getSecondSubmission().getName(), similarityExtractor.apply(comparison))));
-        return topComparisons;
-    }
-
-    /**
-     * Converts JPlagComparison to a DTO for displaying only comparisons. See
-     * {@link #generateComparisonReports(JPlagResult)} for a more detailed representation of a comparison.
-     * @return List containing TopComparison DTOs.
-     */
-    private static List<TopComparison> getTopComparisons(List<JPlagComparison> comparisons) {
-        return getTopComparisons(comparisons, JPlagComparison::similarity);
-    }
 
     /**
      * Converts files of a submission to FilesOFSubmission DTO.
@@ -210,7 +184,5 @@ public class ReportObjectFactory {
         return dateFormat.format(date);
     }
 
-    private static List<Integer> intArrayToList(int[] array) {
-        return Arrays.stream(array).boxed().collect(Collectors.toList());
-    }
+
 }

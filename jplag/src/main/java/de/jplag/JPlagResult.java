@@ -112,7 +112,7 @@ public class JPlagResult {
      * @return the similarity distribution array. When JPlag was run with the {@link SimilarityMetric#MAX}, this will return
      * the same distribution as {@link JPlagResult#getSimilarityDistribution()}
      */
-    public int[] getMaxMetricDistribution() {
+    public int[] getMaxSimilarityDistribution() {
         if (options.getSimilarityMetric().equals(SimilarityMetric.MAX)) {
             return similarityDistribution;
         }
@@ -137,9 +137,10 @@ public class JPlagResult {
     }
 
     private int[] calculateDistributionFor(List<JPlagComparison> comparisons, Function<JPlagComparison, Float> similarityExtractor) {
-        int[] similarityDistribution = new int[10];
+        int size = 10;
+        int[] similarityDistribution = new int[size];
         comparisons.stream().map(similarityExtractor).map(percent -> percent / 10).map(Float::intValue).map(index -> index == 10 ? 9 : index)
-                .forEach(index -> similarityDistribution[index]++);
+                .forEach(index -> similarityDistribution[size-1-index]++);
         return similarityDistribution;
     }
 }
