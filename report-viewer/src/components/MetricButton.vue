@@ -8,7 +8,7 @@
       <p class="metric-name">{{ metric.metricName }}</p>
       <div class="tooltip">
         <img alt="?" src="@/assets/help_outline_black_18dp.svg" />
-        <span class="tooltiptext">{{metric.description}}</span>
+        <span class="tooltiptext">{{ metric.description }}</span>
       </div>
     </div>
   </div>
@@ -45,6 +45,7 @@ export default defineComponent({
   box-shadow: #777777 2px 3px 3px;
   padding: 5%;
   margin-right: 5%;
+  height: fit-content;
 }
 
 .wrapper > div > * {
@@ -62,17 +63,10 @@ export default defineComponent({
   color: white;
 }
 
-
-
 .metric-name {
   font-size: xx-large;
   font-weight: bold;
   margin: 0;
-}
-
-.threshold {
-  font-size: small;
-  font-weight: bold;
 }
 
 .selected {
@@ -86,6 +80,8 @@ export default defineComponent({
 .tooltip {
   position: relative;
   display: inline-block;
+  width: fit-content;
+  height: fit-content;
 }
 
 .tooltip .tooltiptext {
@@ -94,7 +90,7 @@ export default defineComponent({
   background-color: black;
   color: #fff;
   text-align: center;
-  padding: 10px ;
+  padding: 10px;
   border-radius: 6px;
   position: absolute;
   z-index: 1;

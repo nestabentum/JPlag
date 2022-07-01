@@ -2,104 +2,106 @@
   Table which display all of the comparisons with their participating ids and similarity percentage for the selected metric.
 -->
 <template>
-  <table>
-    <tr class="head-row">
-      <th>No.</th>
-      <th>Submission 1</th>
-      <th></th>
-      <th>Submission 2</th>
-      <th>Match %</th>
-    </tr>
-    <tr
-      v-for="(comparison, index) in topComparisons"
-      :key="
-        comparison.firstSubmissionId +
-        comparison.secondSubmissionId +
-        comparison.matchPercentage
-      "
-      class="selectable"
-    >
-      <td
-        @click="
-          navigateToComparisonView(
-            comparison.firstSubmissionId,
-            comparison.secondSubmissionId
-          )
+  <div id="comparisonsList">
+    <table>
+      <tr class="head-row">
+        <th>No.</th>
+        <th>Submission 1</th>
+        <th></th>
+        <th>Submission 2</th>
+        <th>Match %</th>
+      </tr>
+      <tr
+        v-for="(comparison, index) in topComparisons"
+        :key="
+          comparison.firstSubmissionId +
+          comparison.secondSubmissionId +
+          comparison.matchPercentage
         "
+        class="selectable"
       >
-        {{ index + 1 }}.
-      </td>
-      <td
-        :class="{
-          'anonymous-style': isAnonymous(comparison.firstSubmissionId),
-        }"
-        @click="
-          navigateToComparisonView(
-            comparison.firstSubmissionId,
-            comparison.secondSubmissionId
-          )
-        "
-      >
-        {{
-          isAnonymous(comparison.firstSubmissionId)
-            ? "Hidden"
-            : comparison.firstSubmissionId
-        }}
-      </td>
-      <td
-        @click="
-          navigateToComparisonView(
-            comparison.firstSubmissionId,
-            comparison.secondSubmissionId
-          )
-        "
-      >
-        <img alt=">>" src="@/assets/double_arrow_black_18dp.svg" />
-      </td>
-      <td
-        :class="{
-          'anonymous-style': isAnonymous(comparison.secondSubmissionId),
-        }"
-        @click="
-          navigateToComparisonView(
-            comparison.firstSubmissionId,
-            comparison.secondSubmissionId
-          )
-        "
-      >
-        {{
-          isAnonymous(comparison.secondSubmissionId)
-            ? "Hidden"
-            : comparison.secondSubmissionId
-        }}
-      </td>
-      <td>{{ formattedMatchPercentage(comparison.matchPercentage) }}</td>
-      <td>
-        <img
-          v-if="
-            isInCluster(
+        <td
+          @click="
+            navigateToComparisonView(
               comparison.firstSubmissionId,
               comparison.secondSubmissionId
             )
           "
-          alt=">>"
-          src="@/assets/keyboard_double_arrow_down_black_18dp.svg"
-          @click="toggleDialog(index)"
-        />
-      </td>
-      <GDialog v-model="dialog[index]">
-        <ClustersList
-          :clusters="
-            getClustersFor(
+        >
+          {{ index + 1 }}.
+        </td>
+        <td
+          :class="{
+            'anonymous-style': isAnonymous(comparison.firstSubmissionId),
+          }"
+          @click="
+            navigateToComparisonView(
               comparison.firstSubmissionId,
               comparison.secondSubmissionId
             )
           "
-          :comparison="comparison"
-        />
-      </GDialog>
-    </tr>
-  </table>
+        >
+          {{
+            isAnonymous(comparison.firstSubmissionId)
+              ? "Hidden"
+              : comparison.firstSubmissionId
+          }}
+        </td>
+        <td
+          @click="
+            navigateToComparisonView(
+              comparison.firstSubmissionId,
+              comparison.secondSubmissionId
+            )
+          "
+        >
+          <img alt=">>" src="@/assets/double_arrow_black_18dp.svg" />
+        </td>
+        <td
+          :class="{
+            'anonymous-style': isAnonymous(comparison.secondSubmissionId),
+          }"
+          @click="
+            navigateToComparisonView(
+              comparison.firstSubmissionId,
+              comparison.secondSubmissionId
+            )
+          "
+        >
+          {{
+            isAnonymous(comparison.secondSubmissionId)
+              ? "Hidden"
+              : comparison.secondSubmissionId
+          }}
+        </td>
+        <td>{{ formattedMatchPercentage(comparison.matchPercentage) }}</td>
+        <td>
+          <img
+            v-if="
+              isInCluster(
+                comparison.firstSubmissionId,
+                comparison.secondSubmissionId
+              )
+            "
+            alt=">>"
+            src="@/assets/keyboard_double_arrow_down_black_18dp.svg"
+            @click="toggleDialog(index)"
+          />
+        </td>
+        <GDialog v-model="dialog[index]">
+          <ClustersList
+            :clusters="
+              getClustersFor(
+                comparison.firstSubmissionId,
+                comparison.secondSubmissionId
+              )
+            "
+            :comparison="comparison"
+          />
+        </GDialog>
+      </tr>
+    </table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -220,6 +222,19 @@ table {
   border-collapse: collapse;
   font-size: larger;
   text-align: center;
+  border-radius: 10px;
+}
+
+#comparisonsList {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  padding: 0% 2% 2% 2%;
+  background: var(--primary-color-light);
+  border-radius: 10px;
+  box-shadow: var(--shadow-color) 2px 3px 3px;
+  height: 90vh;
+  overflow: auto;
 }
 
 tr:nth-child(odd) {
@@ -235,6 +250,9 @@ th {
   padding-top: 2%;
   padding-bottom: 2%;
   color: var(--on-primary-color);
+  position: sticky;
+  top: 0;
+  background: var(--primary-color-light);
 }
 
 td {

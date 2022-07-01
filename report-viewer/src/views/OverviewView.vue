@@ -3,9 +3,11 @@
 -->
 <template>
   <div class="container">
-    <div class="column-container" style="width: 30%">
-      <h1>JPlag Report</h1>
-      <p class="section-title">Main Info:</p>
+    <div class="column-container" style="width: 25%">
+      <div class="column-header-row">
+        <h1>JPlag Report</h1>
+      </div>
+      <span class="section-title">Main Info:</span>
       <div id="basicInfo">
         <TextInformation
           :has-additional-info="hasMoreSubmissionPaths"
@@ -51,38 +53,40 @@
         />
       </div>
       <div id="logo-section">
-        <img id="logo" alt="JPlag" src="@/assets/logo-nobg.png" />
+        <img id="logo" alt="JPlag" src="@/assets/logo-nobg.png" style="width: 40%;" />
       </div>
     </div>
 
     <div class="column-container" style="width: 35%">
-      <div id="metrics">
-        <p class="section-title">Metric:</p>
-        <div id="metrics-list">
-          <MetricButton
-            v-for="(metric, index) in overview.metrics"
-            :id="metric.metricName"
-            :key="metric.metricName"
-            :is-selected="selectedMetric[index]"
-            :metric="metric"
-            @click="selectMetric(index)"
-          />
+      <div class="column-header-row">
+        <div id="metrics">
+          <h1>Metric:</h1>
+          <div id="metrics-list">
+            <MetricButton
+              v-for="(metric, index) in overview.metrics"
+              :id="metric.metricName"
+              :key="metric.metricName"
+              :is-selected="selectedMetric[index]"
+              :metric="metric"
+              @click="selectMetric(index)"
+            />
+          </div>
         </div>
       </div>
-      <p class="section-title">Distribution:</p>
+      <span class="section-title">Distribution:</span>
       <DistributionDiagram
         :distribution="distributions[selectedMetricIndex]"
         class="full-width"
       />
     </div>
     <div class="column-container" style="width: 35%">
-      <p class="section-title">Top Comparisons:</p>
-      <div id="comparisonsList">
-        <ComparisonsTable
-          :clusters="overview.clusters"
-          :top-comparisons="topComps[selectedMetricIndex]"
-        />
+      <div class="column-header-row">
+        <h1>Top Comparisons:</h1>
       </div>
+      <ComparisonsTable
+        :clusters="overview.clusters"
+        :top-comparisons="topComps[selectedMetricIndex]"
+      />
     </div>
   </div>
 </template>
@@ -194,7 +198,9 @@ export default defineComponent({
     let distributions = ref(overview.metrics.map((m) => m.distribution));
 
     //Top Comparisons
-    let topComps : Ref<Array<Array<ComparisonListElement>>>= ref(overview.metrics.map((m) => m.comparisons));
+    let topComps: Ref<Array<Array<ComparisonListElement>>> = ref(
+      overview.metrics.map((m) => m.comparisons)
+    );
 
     const hasMoreSubmissionPaths = overview.submissionFolderPath.length > 1;
     const submissionPathValue = hasMoreSubmissionPaths
@@ -231,12 +237,17 @@ hr {
   width: 100%;
   box-shadow: #d7e3fc 0 1px;
 }
+.column-header-row {
+  height: 10vh;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 
 .container {
   display: flex;
   align-items: stretch;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   margin: 0;
   overflow: auto;
   background: var(--background-color);
@@ -281,16 +292,6 @@ hr {
 #metrics-list {
   display: flex;
   margin-left: 2%;
-}
-
-#comparisonsList {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  padding: 2%;
-  background: var(--primary-color-light);
-  border-radius: 10px;
-  box-shadow: var(--shadow-color) 2px 3px 3px;
 }
 
 #logo-section {
