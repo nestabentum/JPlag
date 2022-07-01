@@ -29,7 +29,7 @@ export default defineComponent({
     //Highest count of submissions in a percentage range. We set the diagrams maximum shown value to maxVal + 5,
     //otherwise maximum is set to the highest count of submissions and is one bar always reaches the end.
     let maxVal = ref(Math.max(...props.distribution));
-    const labels = ['0-10%', '11-20%', '21-30%', '31-40%', '41-50%', '51-60%', '61-70%', '71-80%', '81-90%', '91-100%']
+    const labels = ['91-100%', '81-90%','71-80%' ,'61-70%', '51-60%', ', 41-50%', '31-40%', '21-30%', '11-20%', '0-10%']
     const dataSetStyle = {
       label: 'Count',
       backgroundColor: 'rgba(149, 168, 241, 0.5)',

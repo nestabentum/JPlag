@@ -97,8 +97,8 @@ public class JPlagResult {
     /**
      * For the {@link SimilarityMetric} JPlag was run with, this returns the similarity distribution of detected matches in
      * a 10-element array. Each entry represents the absolute frequency of matches whose similarity lies within the
-     * respective interval. Intervals: 0: [0% - 10%), 1: [10% - 20%), 2: [20% - 30%), ..., 9: [90% - 100%]
-     * @return the similarity distribution array.
+     * respective interval. Intervals: 0: [90% - 100%], 1: [80% - 90%), 2: [60% - 70%), ..., 9: [0% - 10%)
+     * @return the average similarity distribution array.
      */
     public int[] getSimilarityDistribution() {
         return similarityDistribution;
@@ -107,10 +107,9 @@ public class JPlagResult {
     /**
      * For the {@link SimilarityMetric#MAX} that is built in to every {@link JPlagComparison}, this returns the similarity
      * distribution of detected matches in a 10-element array. Each entry represents the absolute frequency of matches whose
-     * similarity lies within the respective interval. Intervals: 0: [0% - 10%), 1: [10% - 20%), 2: [20% - 30%), ..., 9:
-     * [90% - 100%]
-     * @return the similarity distribution array. When JPlag was run with the {@link SimilarityMetric#MAX}, this will return
-     * the same distribution as {@link JPlagResult#getSimilarityDistribution()}
+     * similarity lies within the respective interval. Intervals: 0: [90% - 100%], 1: [80% - 90%), 2: [60% - 70%), ..., 9:
+     * [0% - 10%)
+     * @return the maximal similarity distribution array.
      */
     public int[] getMaxSimilarityDistribution() {
         return calculateDistributionFor(comparisons, (JPlagComparison::maximalSimilarity));
@@ -137,7 +136,7 @@ public class JPlagResult {
         int size = 10;
         int[] similarityDistribution = new int[size];
         comparisons.stream().map(similarityExtractor).map(percent -> percent / 10).map(Float::intValue).map(index -> index == 10 ? 9 : index)
-                .forEach(index -> similarityDistribution[size-1-index]++);
+                .forEach(index -> similarityDistribution[size - 1 - index]++);
         return similarityDistribution;
     }
 }
