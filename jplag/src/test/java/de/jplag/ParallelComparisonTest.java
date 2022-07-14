@@ -27,7 +27,7 @@ public class ParallelComparisonTest extends TestBase {
         assertEquals(2, result.getNumberOfSubmissions());
         assertEquals(1, result.getAllComparisons().size());
         assertEquals(1, result.getAllComparisons().get(0).getMatches().size());
-        assertEquals(1, result.getSimilarityDistribution()[6]);
+        assertEquals(1, result.getSimilarityDistribution()[3]);
         assertEquals(62.07f, result.getAllComparisons().get(0).similarity(), DELTA);
     }
 
