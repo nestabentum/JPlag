@@ -155,6 +155,7 @@ export default defineComponent({
     };
 
     const navigateToComparisonView = (firstId: string, secondId: string) => {
+      console.log("navigating to comparison view with props " + firstId + " " + secondId);
       if (!store.state.single) {
         router.push({
           name: "ComparisonView",
