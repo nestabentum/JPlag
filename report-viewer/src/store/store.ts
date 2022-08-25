@@ -101,7 +101,12 @@ const store = createStore<State>({
             state.submissionIdsToComparisonFileName
         );
         console.log(
-          "level1: " + state.submissionIdsToComparisonFileName.get(submissionId1)
+          "level1: submissionIds 1 & 2: " + submissionId1 + " "+ submissionId2
+        ); 
+        console.log(
+          "level1: state: " + state
+        ); console.log(
+          "level1: state.submissionIdsToComparisonFileName " + state.submissionIdsToComparisonFileName
         );
         console.log(
           "level2: " +
