@@ -85,7 +85,7 @@ export default defineComponent({
   setup(props) {
     const store = useStore();
     const router = useRouter();
-
+    console.log(store);
     let comparison;
     //getting the comparison file based on the used mode (zip, local, single)
     if (store.state.local) {
