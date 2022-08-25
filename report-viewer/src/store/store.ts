@@ -53,7 +53,7 @@ interface LoadConfiguration {
 
 const store = createStore<State>({
   state: {
-    submissionIdsToComparisonFileName: new Map<string, Map<string, string>>(),
+    submissionIdsToComparisonFileName: new Map(),
     /**
      * The set of ids to be hidden.
      */
@@ -95,23 +95,23 @@ const store = createStore<State>({
       return Array.from(state.fileIdToDisplayName.keys());
     },
     getComparisonFileName:
-      (state) => (submissionId: string, fileId: string) => {
+      (state) => (submissionId1: string, submissionId2: string) => {
         console.log(
           "getting comparsionFileName from map: " +
             state.submissionIdsToComparisonFileName
         );
         console.log(
-          "level1: " + state.submissionIdsToComparisonFileName.get(submissionId)
+          "level1: " + state.submissionIdsToComparisonFileName.get(submissionId1)
         );
         console.log(
           "level2: " +
             state.submissionIdsToComparisonFileName
-              .get(submissionId)
-              ?.get(fileId)
+              .get(submissionId1)
+              ?.get(submissionId2)
         );
         return state.submissionIdsToComparisonFileName
-          .get(submissionId)
-          ?.get(fileId);
+          .get(submissionId1)
+          ?.get(submissionId2);
       },
     getComparisonFileForSubmissions:
       (state, getters) => (submissionId1: string, submissionId2: string) => {
