@@ -100,16 +100,23 @@ const store = createStore<State>({
           .get(submissionId)
           ?.get(fileId);
       },
-      getComparisonFileForSubmissions: (state, getters) => (submissionId1: string, submissionId2: string) => {
-        const expectedFileName = getters.getComparisonFileName(submissionId1, submissionId2);
-        const index = Object.keys(store.state.files).find(
-          (name) =>
-             name.endsWith(expectedFileName)
+    getComparisonFileForSubmissions:
+      (state, getters) => (submissionId1: string, submissionId2: string) => {
+        const expectedFileName = getters.getComparisonFileName(
+          submissionId1,
+          submissionId2
         );
-        return index != undefined
-          ? store.state.files[index]
-          : undefined
-      }
+        console.log("getting the file");
+        console.log("expected file name: " + expectedFileName);
+        console.log("keys: " + Object.keys(state.files));
+
+        const index = Object.keys(state.files).find((name) =>
+          name.endsWith(expectedFileName)
+        );
+
+        console.log("index: " + index);
+        return index != undefined ? store.state.files[index] : undefined;
+      },
   },
   mutations: {
     addAnonymous(state: State, id) {
