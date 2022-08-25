@@ -96,6 +96,19 @@ const store = createStore<State>({
     },
     getComparisonFileName:
       (state) => (submissionId: string, fileId: string) => {
+        console.log(
+          "getting comparsionFileName from map: " +
+            state.submissionIdsToComparisonFileName
+        );
+        console.log(
+          "level1: " + state.submissionIdsToComparisonFileName.get(submissionId)
+        );
+        console.log(
+          "level2: " +
+            state.submissionIdsToComparisonFileName
+              .get(submissionId)
+              ?.get(fileId)
+        );
         return state.submissionIdsToComparisonFileName
           .get(submissionId)
           ?.get(fileId);
