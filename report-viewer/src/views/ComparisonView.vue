@@ -83,6 +83,7 @@ export default defineComponent({
     },
   },
   setup(props) {
+    console.log("I HAVE IDS " + props.firstId + " " + props.secondId);
     const store = useStore();
     const router = useRouter();
     console.log(store);
