@@ -190,7 +190,10 @@ export default defineComponent({
       showMatchInSecond(e, 2, match.secondFile, match.startInSecond);
     };
 
-    const isAnonymous = (id: string) => store.state.anonymous.has(id);
+    const isAnonymous = (id: string) => {
+      console.log("called isAnonymous in ComparisonView");
+      store.state.anonymous.has(id);
+    };
     //Left panel
     const hideLeftPanel = ref(true);
     const togglePanel = () => {
