@@ -105,6 +105,7 @@ export default defineComponent({
         props.firstId,
         props.secondId
       );
+      console.log("ComparisonFile is " + comparisonFile);
       if (comparisonFile) {
         comparison = ComparisonFactory.getComparison(
           JSON.parse(comparisonFile)
