@@ -151,7 +151,6 @@ export default defineComponent({
      * @param line
      */
     const showMatchInFirst = (
-      e: unknown,
       panel: number,
       file: string,
       line: number
@@ -171,7 +170,6 @@ export default defineComponent({
      * @param line
      */
     const showMatchInSecond = (
-      e: unknown,
       panel: number,
       file: string,
       line: number
@@ -184,9 +182,9 @@ export default defineComponent({
         ?.scrollIntoView();
     };
 
-    const showMatch = (e: unknown, match: Match) => {
-      showMatchInFirst(e, 1, match.firstFile, match.startInFirst);
-      showMatchInSecond(e, 2, match.secondFile, match.startInSecond);
+    const showMatch = (match: Match) => {
+      showMatchInFirst(1, match.firstFile, match.startInFirst);
+      showMatchInSecond(2, match.secondFile, match.startInSecond);
     };
 
     const isAnonymous = (id: string) => store.state.anonymous.has(id);

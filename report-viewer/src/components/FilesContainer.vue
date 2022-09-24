@@ -64,15 +64,15 @@ export default defineComponent({
   },
 
   setup(props, { emit }) {
+    console.log(props.matches)
     /**
      * Passes lineSelected event, emitted from LineOfCode, to parent.
-     * @param e
      * @param index
      * @param file
      * @param line
      */
-    const lineSelected = (e: unknown, index: number, file: string, line: number) => {
-      emit("lineSelected", e, index, file, line);
+    const lineSelected = (index: number, file: string, line: number) => {
+      emit("lineSelected", index, file, line);
     };
     return {
       lineSelected,

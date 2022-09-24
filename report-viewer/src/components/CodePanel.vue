@@ -29,7 +29,7 @@
       <div v-if="!isEmpty(lines)" class="code-container">
         <LineOfCode
           v-for="(line, index) in lines"
-          :id="String(panelId).concat(title).concat(index)"
+          :id="String(panelId).concat(title).concat(index.toString())"
           :key="index"
           :color="coloringArray[index]"
           :is-first="isFirst[index]"
@@ -37,15 +37,7 @@
           :line-number="index + 1"
           :text="line"
           :visible="collapse"
-          @click="
-            $emit(
-              'lineSelected',
-              $event,
-              linksArray[index].panel,
-              linksArray[index].file,
-              linksArray[index].line
-            )
-          "
+          @click="emitLineClicked(index)"
         />
       </div>
       <div v-else class="code-container">
@@ -55,11 +47,13 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
-import LineOfCode from "./LineOfCode";
+<script lang="ts">
+import { MatchInSingleFile } from "@/model/MatchInSingleFile";
+import { defineComponent, ref, Ref } from "vue";
+import LineOfCode from "./LineOfCode.vue";
 
 export default defineComponent({
+  emits: ["lineSelected", "toggleCollapse"],
   name: "CodePanel",
   components: { LineOfCode },
   props: {
@@ -68,19 +62,21 @@ export default defineComponent({
      */
     title: {
       type: String,
+      required: true,
     },
     /**
      * Index of file amongst other files in submission.
      */
     fileIndex: {
       type: Number,
+      required: true,
     },
     /**
      * Code lines of the file.
      * type: Array<string>
      */
     lines: {
-      type: Array,
+      type: Array<string>,
       required: true,
     },
     /**
@@ -88,13 +84,15 @@ export default defineComponent({
      * type: Array<MatchInSingleFile>
      */
     matches: {
-      type: Array,
+      type: Array<MatchInSingleFile>,
+      required: true,
     },
     /**
      * Id of the FilesContainer. Needed for lines link generation.
      */
     panelId: {
       type: Number,
+      required: true,
     },
     /**
      * Indicates whether files is collapsed or not.
@@ -103,7 +101,7 @@ export default defineComponent({
       type: Boolean,
     },
   },
-  setup(props) {
+  setup(props, { emit }) {
     /**
      * An object containing the color of each line in code. Keys are line numbers, values are their color.
      * Example: {
@@ -116,9 +114,9 @@ export default defineComponent({
      * }
      * @type {Ref<UnwrapRef<{}>>}
      */
-    const coloringArray = ref({});
-    const isEmpty = (lines) => {
-      return lines.length === 0 || lines.every((line) => !(line.trim()));
+    const coloringArray: Ref<Array<string>> = ref([]);
+    const isEmpty = (lines: Array<string>) => {
+      return lines.length === 0 || lines.every((line) => !line.trim());
     };
     /**
      * An object containing an object from which an id is to of the line to which this is linked is constructed.
@@ -134,17 +132,26 @@ export default defineComponent({
      * Key is line number, value is id of linked line.
      * @type {Ref<UnwrapRef<{}>>}
      */
-    const linksArray = ref({});
+    const linksArray: Ref<
+      Array<
+        | {
+            panel: number;
+            file: string;
+            line: number;
+          }
+        | string
+      >
+    > = ref([]);
     /**
      * Indicates whether the line is last line of match. Key is line number, value is true or false.
      * @type {Ref<UnwrapRef<{}>>}
      */
-    const isLast = ref({});
+    const isLast: Ref<Array<boolean>> = ref([]);
     /**
      * Indicates whether the line is the first line of a match. Key is line number, value is true or false.
      * @type {Ref<UnwrapRef<{}>>}
      */
-    const isFirst = ref({});
+    const isFirst: Ref<Array<boolean>> = ref([]);
 
     /**
      * Initializing the the upper arrays.
@@ -172,6 +179,18 @@ export default defineComponent({
         isLast.value[i] = false;
       }
     }
+    const emitLineClicked = (index: number) => {
+      if (typeof linksArray.value[index] === "string") {
+        return;
+      } else {
+        emit(
+          "lineSelected",
+          linksArray.value[index].panel,
+          linksArray.value[index].file,
+          linksArray.value[index].line
+        );
+      }
+    };
 
     return {
       coloringArray,
@@ -179,6 +198,7 @@ export default defineComponent({
       isFirst,
       isLast,
       isEmpty,
+      emitLineClicked,
     };
   },
 });
